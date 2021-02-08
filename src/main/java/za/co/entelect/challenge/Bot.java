@@ -7,10 +7,12 @@ import java.util.*;
 
 public class Bot {
     private static Random random;
+    private static String state;
     private static GameState gameState;
 
-    public Bot(Random newrandom, GameState newgameState) {
+    public Bot(Random newrandom, String newState, GameState newgameState) {
         random = newrandom;
+        state = newState;
         gameState = newgameState;
     }
 
@@ -20,6 +22,14 @@ public class Bot {
 
     public static Random getRandom() {
         return random;
+    }
+
+    public static Opponent getOpponent() {
+        return gameState.opponents[0];
+    }
+
+    public static String getState() {
+        return state;
     }
 
     public Command run() {

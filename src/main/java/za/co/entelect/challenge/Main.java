@@ -32,7 +32,7 @@ public class Main {
                 String state = new String(Files.readAllBytes(Paths.get(statePath)));
 
                 GameState gameState = gson.fromJson(state, GameState.class);
-                Command command = new Bot(random, gameState).run();
+                Command command = new Bot(random, state, gameState).run();
 
                 System.out.println(String.format("C;%d;%s", roundNumber, command.render()));
             } catch (Exception e) {
