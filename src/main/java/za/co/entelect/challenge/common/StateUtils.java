@@ -12,5 +12,7 @@ public class StateUtils {
         GameState gameState = Bot.getGameState();
         return Arrays.asList(gameState.myPlayer.worms);
     }
+    
+
 
 }
