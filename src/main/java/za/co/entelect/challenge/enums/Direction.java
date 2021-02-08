@@ -1,7 +1,7 @@
 package za.co.entelect.challenge.enums;
 
-public enum Direction {
-
+public enum Direction 
+{
     N(0, -1),
     NE(1, -1),
     E(1, 0),

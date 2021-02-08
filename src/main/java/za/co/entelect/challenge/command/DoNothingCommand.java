@@ -1,8 +1,10 @@
 package za.co.entelect.challenge.command;
 
-public class DoNothingCommand implements Command {
+public class DoNothingCommand implements Command 
+{
     @Override
-    public String render() {
+    public String render() 
+    {
         return "nothing";
     }
 }

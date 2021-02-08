@@ -1,5 +1,6 @@
 package za.co.entelect.challenge.command;
 
-public interface Command {
+public interface Command 
+{
     String render();
 }

@@ -2,7 +2,8 @@ package za.co.entelect.challenge.enums;
 
 import com.google.gson.annotations.SerializedName;
 
-public enum Profession {
+public enum Profession 
+{
     @SerializedName("Commando")
     COMMANDO,
     @SerializedName("Agent")
