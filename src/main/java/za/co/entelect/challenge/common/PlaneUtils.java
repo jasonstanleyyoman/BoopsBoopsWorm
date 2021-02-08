@@ -3,39 +3,30 @@ package za.co.entelect.challenge.common;
 import za.co.entelect.challenge.enums.Direction;
 import za.co.entelect.challenge.entities.Position;
 
-public class PlaneUtils 
-{
-    public static int euclideanDistance(int aX, int aY, int bX, int bY) 
-    {
+public class PlaneUtils {
+    public static int euclideanDistance(int aX, int aY, int bX, int bY) {
         return (int) (Math.sqrt(Math.pow(aX - bX, 2) + Math.pow(aY - bY, 2)));
     }
 
-    public static Direction resolveDirection(Position a, Position b) 
-    {
+    public static Direction resolveDirection(Position a, Position b) {
         StringBuilder builder = new StringBuilder();
 
         int verticalComponent = b.y - a.y;
         int horizontalComponent = b.x - a.x;
 
-        if (verticalComponent < 0) 
-        {
+        if (verticalComponent < 0) {
             builder.append('N');
-        } 
-        else if (verticalComponent > 0) 
-        {
+        } else if (verticalComponent > 0) {
             builder.append('S');
         }
 
-        if (horizontalComponent < 0) 
-        {
+        if (horizontalComponent < 0) {
             builder.append('W');
-        } 
-        else if (horizontalComponent > 0) 
-        {
+        } else if (horizontalComponent > 0) {
             builder.append('E');
         }
 
         return Direction.valueOf(builder.toString());
     }
-    
+
 }

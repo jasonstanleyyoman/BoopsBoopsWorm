@@ -3,7 +3,6 @@ package za.co.entelect.challenge.command;
 import za.co.entelect.challenge.enums.Direction;
 
 public class ShootCommand implements Command {
-
     private Direction direction;
 
     public ShootCommand(Direction direction) {

@@ -2,8 +2,7 @@ package za.co.entelect.challenge.entities;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Worm 
-{
+public class Worm {
     @SerializedName("id")
     public int id;
 

@@ -1,7 +1,6 @@
 package za.co.entelect.challenge.command;
 
 public class SelectCommand implements Command {
-
     private final int wormId;
     private final Command command;
 

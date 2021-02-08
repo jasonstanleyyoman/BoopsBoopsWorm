@@ -2,8 +2,7 @@ package za.co.entelect.challenge.entities;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Opponent 
-{
+public class Opponent {
     @SerializedName("id")
     public int id;
 
@@ -13,4 +12,3 @@ public class Opponent
     @SerializedName("worms")
     public Worm[] worms;
 }
-e

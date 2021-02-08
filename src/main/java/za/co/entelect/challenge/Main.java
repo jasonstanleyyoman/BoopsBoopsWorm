@@ -9,26 +9,23 @@ import java.nio.file.Paths;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Main 
-{
+public class Main {
     private static final String ROUNDS_DIRECTORY = "rounds";
     private static final String STATE_FILE_NAME = "state.json";
 
     /**
-     * Read the current state, feed it to the bot, get the output and print it to stdout
+     * Read the current state, feed it to the bot, get the output and print it to
+     * stdout
      *
      * @param args the args
      **/
-    public static void main(String[] args) 
-    {
+    public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         Gson gson = new Gson();
         Random random = new Random(System.nanoTime());
 
-        while (true) 
-        {
-            try 
-            {
+        while (true) {
+            try {
                 int roundNumber = sc.nextInt();
 
                 String statePath = String.format("./%s/%d/%s", ROUNDS_DIRECTORY, roundNumber, STATE_FILE_NAME);
@@ -38,10 +35,9 @@ public class Main
                 Command command = new Bot(random, gameState).run();
 
                 System.out.println(String.format("C;%d;%s", roundNumber, command.render()));
-            } 
-            catch (Exception e) 
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
+                sc.close();
             }
         }
     }
