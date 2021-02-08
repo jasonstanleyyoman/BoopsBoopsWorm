@@ -8,6 +8,6 @@ import za.co.entelect.challenge.entities.weapons.BananaBomb;
 public class Agent extends MyWorm {
 
     @SerializedName("bananaBombs")
-    public BananaBomb weapons;
+    public BananaBomb bananaBomb;
 
 }

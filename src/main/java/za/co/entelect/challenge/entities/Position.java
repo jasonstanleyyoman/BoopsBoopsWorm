@@ -17,4 +17,16 @@ public class Position {
 
     @SerializedName("y")
     public int y;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+
+        if (!(o instanceof Position || o instanceof Cell))
+            return false;
+
+        Position p = (Position) o;
+        return this.x == p.x && this.y == p.y;
+    }
 }

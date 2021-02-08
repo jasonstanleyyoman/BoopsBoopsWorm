@@ -28,6 +28,14 @@ public class Bot {
         return gameState.opponents[0];
     }
 
+    public static List<Worm> getOpponentWorms() {
+        return Arrays.asList(getOpponent().worms);
+    }
+
+    public static List<MyWorm> getMyWormList() {
+        return Arrays.asList(gameState.myPlayer.worms);
+    }
+
     public static String getState() {
         return state;
     }
