@@ -105,7 +105,7 @@ public class PlaneUtils {
         return positionList;
     }
 
-    public static Cell nextLine(Cell now, Cell end) {
+    public static Cell nextLine(Position now, Position end) {
         List<Cell> sur = getSurroundingCells(now.x, now.y);
         Cell targetMove = sur.remove(0);
         double dist = targetMove.distance(end);

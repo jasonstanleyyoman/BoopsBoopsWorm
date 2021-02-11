@@ -1,12 +1,15 @@
 package za.co.entelect.challenge;
 
-import za.co.entelect.challenge.command.*;
-import za.co.entelect.challenge.common.WormUtils;
-import za.co.entelect.challenge.entities.*;
-import za.co.entelect.challenge.enums.Profession;
-import za.co.entelect.challenge.common.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
-import java.util.*;
+import za.co.entelect.challenge.command.*;
+import za.co.entelect.challenge.common.*;
+import za.co.entelect.challenge.entities.*;
+import za.co.entelect.challenge.entities.worm.*;
+import za.co.entelect.challenge.enums.Profession;
+import za.co.entelect.challenge.enums.CellType;
 
 public class Bot {
     private static Random random;
@@ -46,28 +49,31 @@ public class Bot {
     public Command run() {
         MyWorm currentWorm = WormUtils.getCurrentWorm();
         Opponent opponent = getOpponent();
+        Technologist technologist = gameState.myPlayer.getTechnologist();
+        Commando commando = gameState.myPlayer.getCommando();
+        List<MyWorm> myWormsWithProf = Arrays.asList(new MyWorm[] { technologist, commando });
 
         // Early phase of the game
         Worm enemyAgent = Arrays.asList(Bot.getOpponent().worms).stream()
-                .filter(w -> w.profession.equals(Profession.AGENT)).findFirst().get();
+                .filter(w -> w.profession.equals(Profession.AGENT)).findFirst().orElse(null);
         if (enemyAgent.health > 0) { // Greedy by banana
-            // Select worm paling deket sama banana
-            MyWorm wormToBeSelected = WormUtils.targetBanana();
-            // Jika wormToBeSelected bisa shoot, shoot aja.
-            Worm wormYangBisaDitembak = WormUtils.getFirstWormInRange(wormToBeSelected);
+            Worm wormYangBisaDitembak = WormUtils.getFirstWormInRange(technologist);
             if (wormYangBisaDitembak.id == enemyAgent.id) {
-                return new SelectCommand(wormToBeSelected.id, new ShootCommand(
+                if (enemyAgent.roundsUntilUnfrozen == 0) {
+                    return new SelectCommand(technologist.id, new SnowballCommand(enemyAgent.position));
+                }
+                return new SelectCommand(technologist.id, new ShootCommand(
                         PlaneUtils.resolveDirection(currentWorm.position, wormYangBisaDitembak.position)));
             } else {
+                Worm furthestWorm = WormUtils.getFurthestWorm(myWormsWithProf, wormYangBisaDitembak.position);
 
-                // if (perlu dig){
-                // insert dig code here
-                // }
+                Cell nextCell = PlaneUtils.nextLine(technologist.position, enemyAgent.position);
 
-                // else if (tidak perlu dig) {
-                // PlaneUtils.nextLineGreedy(wormToBeSelected.)
-                // return new SelectCommand(wormToBeSelected.id, new MoveCommand(x, y));
-                // }
+                if (nextCell.type == CellType.DIRT) {
+                    return new SelectCommand(furthestWorm.id, new DigCommand(nextCell));
+                } else {
+                    return new SelectCommand(furthestWorm.id, new MoveCommand(nextCell));
+                }
             }
         } else {
             // Late phase of the game (enemy agent uda mati)
