@@ -9,8 +9,10 @@ public class Cell extends Position {
         super();
     }
 
-    public Cell(int x, int y) {
-        super(x, y);
+    public Cell(Cell other) {
+        super(other);
+        this.type = other.type;
+        this.powerUp = other.powerUp;
     }
 
     @SerializedName("type")
@@ -18,4 +20,16 @@ public class Cell extends Position {
 
     @SerializedName("powerup")
     public PowerUp powerUp;
+
+    @Override
+    public Cell modifyX(int dx) {
+        this.x += dx;
+        return this;
+    }
+
+    @Override
+    public Cell modifyY(int dy) {
+        this.y += dy;
+        return this;
+    }
 }

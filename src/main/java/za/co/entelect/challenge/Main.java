@@ -1,13 +1,11 @@
 package za.co.entelect.challenge;
 
 import com.google.gson.Gson;
-import za.co.entelect.challenge.command.Command;
 import za.co.entelect.challenge.entities.GameState;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
-import java.util.Scanner;
 
 public class Main {
     private static final String ROUNDS_DIRECTORY = "rounds";
@@ -35,9 +33,15 @@ public class Main {
 
                 GameState gameState = gson.fromJson(state, GameState.class);
                 new Bot(random, state, gameState);
-                System.out.println(gameState.myPlayer.getAgent().profession);
-                System.out.println(gameState.myPlayer.getCommando().profession);
-                System.out.println(gameState.myPlayer.getTechnologist().profession);
+
+                System.out.println(state.length());
+                // List<Cell> lines = PlaneUtils.generateLine(new Cell(1, 2), new Cell(3, 7));
+
+                // for (int i = 0; i < lines.size(); i++) {
+                // System.out.println(String.format("(%d, %d)", lines.get(i).x,
+                // lines.get(i).y));
+                // }
+
                 break;
                 // Command command = new Bot(random, state, gameState).run();
 

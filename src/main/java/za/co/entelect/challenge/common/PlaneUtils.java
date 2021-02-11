@@ -1,24 +1,30 @@
 package za.co.entelect.challenge.common;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import za.co.entelect.challenge.Bot;
 import za.co.entelect.challenge.entities.Cell;
 import za.co.entelect.challenge.entities.GameState;
-import za.co.entelect.challenge.entities.MyWorm;
-import za.co.entelect.challenge.entities.Opponent;
 import za.co.entelect.challenge.entities.Position;
-import za.co.entelect.challenge.entities.Worm;
 import za.co.entelect.challenge.enums.CellType;
 import za.co.entelect.challenge.enums.Direction;
 
 public class PlaneUtils {
+    public static int euclideanDistance(Position A, Position B) {
+        return (int) (Math.sqrt(Math.pow(A.x - B.x, 2) + Math.pow(A.y - B.y, 2)));
+    }
+
+    public static double realEuclideanDistance(Position A, Position B) {
+        return (Math.sqrt(Math.pow(A.x - B.x, 2) + Math.pow(A.y - B.y, 2)));
+    }
+
     public static int euclideanDistance(int aX, int aY, int bX, int bY) {
         return (int) (Math.sqrt(Math.pow(aX - bX, 2) + Math.pow(aY - bY, 2)));
+    }
+
+    public static double realEuclideanDistance(int aX, int aY, int bX, int bY) {
+        return (Math.sqrt(Math.pow(aX - bX, 2) + Math.pow(aY - bY, 2)));
     }
 
     public static Direction resolveDirection(Position a, Position b) {
@@ -40,24 +46,6 @@ public class PlaneUtils {
         }
 
         return Direction.valueOf(builder.toString());
-    }
-
-    public static Worm getFirstWormInRange(final Opponent opponent) {
-        MyWorm currentWorm = WormUtils.getCurrentWorm();
-        Set<String> cells = PlaneUtils
-                .constructFireDirectionLines(new Cell(currentWorm.position.x, currentWorm.position.y),
-                        currentWorm.weapon.range)
-                .stream().flatMap(Collection::stream).map(cell -> String.format("%d_%d", cell.x, cell.y))
-                .collect(Collectors.toSet());
-
-        for (Worm enemyWorm : opponent.worms) {
-            String enemyPosition = String.format("%d_%d", enemyWorm.position.x, enemyWorm.position.y);
-            if (cells.contains(enemyPosition)) {
-                return enemyWorm;
-            }
-        }
-
-        return null;
     }
 
     public static List<Cell> getSurroundingCells(int x, int y) {
@@ -106,20 +94,29 @@ public class PlaneUtils {
     }
 
     public static List<Cell> generateLine(Cell starting, Cell end) {
+        Cell now = new Cell(starting);
         List<Cell> positionList = new ArrayList<>();
-        int gradient = 2 * (end.y - starting.y);
-        int gradientError = gradient - (end.x - starting.x);
-        for (int x = starting.x, y = starting.y; x <= end.x; x++) {
-            positionList.add(new Cell(x, y));
-            gradientError += gradient;
-
-            if (gradientError >= 0) {
-                y += 1;
-                gradientError -= 2 * (end.x - starting.x);
-            }
+        while (!now.equals(end)) {
+            Cell next = new Cell(nextLine(now, end));
+            positionList.add(next);
+            now = next;
 
         }
         return positionList;
+    }
+
+    public static Cell nextLine(Cell now, Cell end) {
+        List<Cell> sur = getSurroundingCells(now.x, now.y);
+        Cell targetMove = sur.remove(0);
+        double dist = targetMove.distance(end);
+        for (Cell c : sur) {
+            double oth = c.distance(end);
+            if (oth < dist) {
+                dist = oth;
+                targetMove = c;
+            }
+        }
+        return targetMove;
     }
 
     public static int lineLength(Cell starting, Cell end) {
