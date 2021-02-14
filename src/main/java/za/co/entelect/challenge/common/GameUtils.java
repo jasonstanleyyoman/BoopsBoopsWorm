@@ -18,4 +18,11 @@ public class GameUtils {
         return new Cell(gameState.map[y][x]);
     }
 
+    public static Cell lookup(Cell cell) {
+        if (!isValidCoordinate(cell.x, cell.y))
+            return null;
+        GameState gameState = Bot.getGameState();
+        return new Cell(gameState.map[cell.y][cell.x]);
+    }
+
 }

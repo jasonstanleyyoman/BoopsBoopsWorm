@@ -16,6 +16,7 @@ import za.co.entelect.challenge.entities.Position;
 import za.co.entelect.challenge.entities.Worm;
 import za.co.entelect.challenge.entities.worm.Commando;
 import za.co.entelect.challenge.entities.worm.Technologist;
+import za.co.entelect.challenge.entities.worm.Agent;
 import za.co.entelect.challenge.enums.CellType;
 import za.co.entelect.challenge.enums.Profession;
 
@@ -70,23 +71,27 @@ public class WormUtils {
     }
 
     /**
-     * Return worm (commando atau technologist) yang paling deket sama agent musuh
+     * Return worm yang paling deket sama Technologist musuh
      */
-    public static MyWorm targetBanana() {
+    public static MyWorm targetTechnologist() {
         Commando commando = Bot.getGameState().myPlayer.getCommando();
         Technologist technologist = Bot.getGameState().myPlayer.getTechnologist();
+        Agent agent = Bot.getGameState().myPlayer.getAgent();
         try {
-            Worm enemyAgent = Arrays.asList(Bot.getOpponent().worms).stream()
-                    .filter(w -> w.profession.equals(Profession.AGENT)).findFirst().get();
+            Worm enemyTechnologist = Arrays.asList(Bot.getOpponent().worms).stream()
+                    .filter(w -> w.profession.equals(Profession.TECHNOLOGIST)).findFirst().get();
             // disini
-            double distanceFromCommandoToAgent = PlaneUtils.realEuclideanDistance(commando.position,
-                    enemyAgent.position);
-            double distanceFromTechnologistToAgent = PlaneUtils.realEuclideanDistance(technologist.position,
-                    enemyAgent.position);
-            if (distanceFromCommandoToAgent >= distanceFromTechnologistToAgent) {
+            double distanceFromCommandoToTechnologist = PlaneUtils.realEuclideanDistance(commando.position,
+                    enemyTechnologist.position);
+            double distanceFromAgentToTechnologist = PlaneUtils.realEuclideanDistance(agent.position,
+                    enemyTechnologist.position);
+            double distanceFromTechnologistToTechnologist = PlaneUtils.realEuclideanDistance(technologist.position, enemyTechnologist.position);
+            if (distanceFromCommandoToTechnologist >= distanceFromAgentToTechnologist & distanceFromCommandoToTechnologist >= distanceFromTechnologistToTechnologist) {
                 return commando;
-            } else {
+            } else if (distanceFromTechnologistToTechnologist >= distanceFromCommandoToTechnologist & distanceFromTechnologistToTechnologist >= distanceFromAgentToTechnologist){
                 return technologist;
+            } else {
+                return agent;
             }
 
         } catch (NoSuchElementException | NullPointerException ignored) {

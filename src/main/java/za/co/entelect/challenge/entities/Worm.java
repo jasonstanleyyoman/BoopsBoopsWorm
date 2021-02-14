@@ -25,4 +25,14 @@ public class Worm {
 
     @SerializedName("profession")
     public Profession profession;
+
+    public Worm() {
+
+    }
+
+    public Worm(Profession profession) {
+        this.id = -999;
+        this.health = 0;
+        this.profession = profession;
+    }
 }
