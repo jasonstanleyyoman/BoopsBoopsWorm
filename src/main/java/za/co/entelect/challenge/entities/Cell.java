@@ -15,6 +15,10 @@ public class Cell extends Position {
         this.powerUp = other.powerUp;
     }
 
+    public Cell(int x, int y) {
+        super(x, y);
+    }
+
     @SerializedName("type")
     public CellType type;
 

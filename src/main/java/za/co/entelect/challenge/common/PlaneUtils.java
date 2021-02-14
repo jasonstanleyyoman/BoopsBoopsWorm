@@ -6,7 +6,9 @@ import java.util.List;
 import za.co.entelect.challenge.Bot;
 import za.co.entelect.challenge.entities.Cell;
 import za.co.entelect.challenge.entities.GameState;
+import za.co.entelect.challenge.entities.MyWorm;
 import za.co.entelect.challenge.entities.Position;
+import za.co.entelect.challenge.entities.Worm;
 import za.co.entelect.challenge.enums.CellType;
 import za.co.entelect.challenge.enums.Direction;
 
@@ -54,8 +56,10 @@ public class PlaneUtils {
         for (int i = x - 1; i <= x + 1; i++) {
             for (int j = y - 1; j <= y + 1; j++) {
                 // Don't include the current position
-                if (i != x && j != y && GameUtils.isValidCoordinate(i, j)) {
-                    cells.add(gameState.map[j][i]);
+                if (!(i == x && y == j)) {
+                    if (GameUtils.isValidCoordinate(i, j)) {
+                        cells.add(gameState.map[j][i]);
+                    }
                 }
             }
         }
@@ -81,7 +85,7 @@ public class PlaneUtils {
                 }
 
                 Cell targetCell = gameState.map[coordinateY][coordinateX];
-                if (targetCell.type != CellType.AIR) {
+                if (targetCell.type == CellType.AIR) {
                     break;
                 }
 
@@ -121,6 +125,14 @@ public class PlaneUtils {
 
     public static int lineLength(Cell starting, Cell end) {
         return PlaneUtils.generateLine(starting, end).size();
+    }
+
+    public static List<List<Cell>> getBananaBombRange() {
+        GameState gameState = Bot.getGameState();
+        MyWorm ourAgent = gameState.myPlayer.getAgent();
+
+        return constructFireDirectionLines(new Cell(ourAgent.position.x, ourAgent.position.y), ourAgent.weapon.range);
+
     }
 
 }

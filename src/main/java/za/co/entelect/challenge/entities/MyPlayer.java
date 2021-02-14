@@ -60,14 +60,14 @@ public class MyPlayer {
     public Agent getAgent() {
         MyWorm worm = getSpecifiedWorm(Profession.AGENT, ws -> ws.toLowerCase().contains("bananabombs"));
         if (worm == null)
-            return null;
+            return new Agent();
         return ((Agent) worm);
     }
 
     public Technologist getTechnologist() {
         MyWorm worm = getSpecifiedWorm(Profession.TECHNOLOGIST, ws -> ws.toLowerCase().contains("snowballs"));
         if (worm == null)
-            return null;
+            return new Technologist();
         return ((Technologist) worm);
     }
 
@@ -75,7 +75,7 @@ public class MyPlayer {
         MyWorm worm = getSpecifiedWorm(Profession.COMMANDO,
                 ws -> (!(ws.toLowerCase().contains("snowballs") || ws.toLowerCase().contains("bananabombs"))));
         if (worm == null)
-            return null;
+            return new Commando();
         return ((Commando) worm);
     }
 

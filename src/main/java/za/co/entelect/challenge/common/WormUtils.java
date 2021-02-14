@@ -32,8 +32,8 @@ public class WormUtils {
         List<Cell> cellShootingArea = new ArrayList<>();
         for (int i = center.x - radius; i <= center.x + radius; i++) {
             for (int j = center.y - radius; j <= center.y + radius; j++) {
-                if (PlaneUtils.euclideanDistance(i, j, center.x, center.y) > radius
-                        && gameState.map[i][j].type != CellType.AIR) {
+                if (PlaneUtils.realEuclideanDistance(i, j, center.x, center.y) <= radius
+                        && gameState.map[j][i].type != CellType.AIR) {
                     cellShootingArea.add(GameUtils.lookup(i, j));
                 }
             }
@@ -85,10 +85,13 @@ public class WormUtils {
                     enemyTechnologist.position);
             double distanceFromAgentToTechnologist = PlaneUtils.realEuclideanDistance(agent.position,
                     enemyTechnologist.position);
-            double distanceFromTechnologistToTechnologist = PlaneUtils.realEuclideanDistance(technologist.position, enemyTechnologist.position);
-            if (distanceFromCommandoToTechnologist >= distanceFromAgentToTechnologist & distanceFromCommandoToTechnologist >= distanceFromTechnologistToTechnologist) {
+            double distanceFromTechnologistToTechnologist = PlaneUtils.realEuclideanDistance(technologist.position,
+                    enemyTechnologist.position);
+            if (distanceFromCommandoToTechnologist >= distanceFromAgentToTechnologist
+                    & distanceFromCommandoToTechnologist >= distanceFromTechnologistToTechnologist) {
                 return commando;
-            } else if (distanceFromTechnologistToTechnologist >= distanceFromCommandoToTechnologist & distanceFromTechnologistToTechnologist >= distanceFromAgentToTechnologist){
+            } else if (distanceFromTechnologistToTechnologist >= distanceFromCommandoToTechnologist
+                    & distanceFromTechnologistToTechnologist >= distanceFromAgentToTechnologist) {
                 return technologist;
             } else {
                 return agent;
@@ -109,5 +112,10 @@ public class WormUtils {
             }
         }
         return currentWorm;
+    }
+
+    public static Worm getEnemy(Profession pr) {
+        return Arrays.asList(Bot.getOpponent().worms).stream().filter(w -> w.profession.equals(pr)).findFirst()
+                .orElse(new Worm(pr));
     }
 }
