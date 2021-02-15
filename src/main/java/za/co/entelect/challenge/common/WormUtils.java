@@ -81,17 +81,12 @@ public class WormUtils {
             Worm enemyTechnologist = Arrays.asList(Bot.getOpponent().worms).stream()
                     .filter(w -> w.profession.equals(Profession.TECHNOLOGIST)).findFirst().get();
             // disini
-            double distanceFromCommandoToTechnologist = PlaneUtils.realEuclideanDistance(commando.position,
-                    enemyTechnologist.position);
-            double distanceFromAgentToTechnologist = PlaneUtils.realEuclideanDistance(agent.position,
-                    enemyTechnologist.position);
-            double distanceFromTechnologistToTechnologist = PlaneUtils.realEuclideanDistance(technologist.position,
-                    enemyTechnologist.position);
-            if (distanceFromCommandoToTechnologist >= distanceFromAgentToTechnologist
-                    & distanceFromCommandoToTechnologist >= distanceFromTechnologistToTechnologist) {
+            double disCtoT = PlaneUtils.realEuclideanDistance(commando.position, enemyTechnologist.position);
+            double disAtoT = PlaneUtils.realEuclideanDistance(agent.position, enemyTechnologist.position);
+            double disTtoT = PlaneUtils.realEuclideanDistance(technologist.position, enemyTechnologist.position);
+            if (disCtoT >= disAtoT & disCtoT >= disTtoT) {
                 return commando;
-            } else if (distanceFromTechnologistToTechnologist >= distanceFromCommandoToTechnologist
-                    & distanceFromTechnologistToTechnologist >= distanceFromAgentToTechnologist) {
+            } else if (disTtoT >= disCtoT & disTtoT >= disAtoT) {
                 return technologist;
             } else {
                 return agent;
@@ -117,5 +112,14 @@ public class WormUtils {
     public static Worm getEnemy(Profession pr) {
         return Arrays.asList(Bot.getOpponent().worms).stream().filter(w -> w.profession.equals(pr)).findFirst()
                 .orElse(new Worm(pr));
+    }
+
+    public static boolean isAlive(Worm w) {
+        if (w == null)
+            return false;
+        if (w.id == -999)
+            return false;
+
+        return (w.health > 0);
     }
 }

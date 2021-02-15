@@ -5,40 +5,42 @@ import java.util.List;
 import java.util.Random;
 
 import za.co.entelect.challenge.command.Command;
-import za.co.entelect.challenge.command.MoveCommand;
-import za.co.entelect.challenge.command.SelectCommand;
-import za.co.entelect.challenge.common.PlaneUtils;
-import za.co.entelect.challenge.entities.Cell;
 import za.co.entelect.challenge.entities.GameState;
 import za.co.entelect.challenge.entities.MyWorm;
 import za.co.entelect.challenge.entities.Opponent;
 import za.co.entelect.challenge.entities.Worm;
-import za.co.entelect.challenge.entities.worm.Agent;
-import za.co.entelect.challenge.entities.worm.Commando;
-import za.co.entelect.challenge.entities.worm.Technologist;
 import za.co.entelect.challenge.enums.Profession;
+import za.co.entelect.challenge.common.WormUtils;
+import za.co.entelect.challenge.common.StrategyUtils;
 
 public class Bot {
-    private static Random random;
-    private static String state;
-    private static GameState gameState;
+    private static Bot instance;
+    private Random random;
+    private String state;
+    private GameState gameState;
 
     public Bot(Random newrandom, String newState, GameState newgameState) {
-        random = newrandom;
-        state = newState;
-        gameState = newgameState;
+        instance = null;
+        instance = this;
+        this.random = newrandom;
+        this.state = newState;
+        this.gameState = newgameState;
+    }
+
+    public static Bot getBot() {
+        return instance;
     }
 
     public static GameState getGameState() {
-        return gameState;
+        return getBot().gameState;
     }
 
     public static Random getRandom() {
-        return random;
+        return getBot().random;
     }
 
     public static Opponent getOpponent() {
-        return gameState.opponents[0];
+        return getGameState().opponents[0];
     }
 
     public static List<Worm> getOpponentWorms() {
@@ -46,31 +48,19 @@ public class Bot {
     }
 
     public static List<MyWorm> getMyWormList() {
-        return Arrays.asList(gameState.myPlayer.worms);
+        return Arrays.asList(getGameState().myPlayer.worms);
     }
 
     public static String getState() {
-        return state;
+        return getBot().state;
     }
 
     public Command run() {
-        // Initializing player's worms
-        Technologist technologist = gameState.myPlayer.getTechnologist();
-        Commando commando = gameState.myPlayer.getCommando();
-        Agent agent = gameState.myPlayer.getAgent();
+        // Set worm target and set player worm to be selected
+        Worm targetWorm = StrategyUtils.setTargetWorm();
 
-        // Initializing a list of player's worms with worm's professions
-        List<MyWorm> myWormsWithProf = Arrays.asList(new MyWorm[] { technologist, commando });
+        Worm selectedWorm = StrategyUtils.findClosestPlayerWorm(targetWorm);
 
-        // Initializing enemy's worms
-        Worm enemyAgent = Arrays.asList(Bot.getOpponent().worms).stream()
-                .filter(w -> w.profession.equals(Profession.AGENT)).findFirst().orElse(new Worm(Profession.AGENT));
-        Worm enemyTechnologist = Arrays.asList(Bot.getOpponent().worms).stream()
-                .filter(w -> w.profession.equals(Profession.TECHNOLOGIST)).findFirst()
-                .orElse(new Worm(Profession.TECHNOLOGIST));
-        Worm enemyCommando = Arrays.asList(Bot.getOpponent().worms).stream()
-                .filter(w -> w.profession.equals(Profession.COMMANDO)).findFirst()
-                .orElse(new Worm(Profession.COMMANDO));
         return null;
         // Strategi
         // Buat fungsi yang akan menentukan worm mana yang akan ditarget (Namanya fungsi
@@ -100,6 +90,7 @@ public class Bot {
         // Kalau kondisi di atas tidak dipenuhi, lanjut ke kondisi bawah
         // Kalau ada yang bisa nembak target kita, tembak aja
         // Kalau kondisi di atas tidak dipenuhi, lanjut ke kondisi bawah
+
         // Sekarang section mana yang jalan
         // Kalau worm kita ada yang jaraknya < 10 (misalnya) dari target, worm ini aja
         // yang digerakkan

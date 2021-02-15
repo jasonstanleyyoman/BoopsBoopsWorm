@@ -8,7 +8,8 @@ import za.co.entelect.challenge.entities.Cell;
 import za.co.entelect.challenge.entities.GameState;
 import za.co.entelect.challenge.entities.MyWorm;
 import za.co.entelect.challenge.entities.Position;
-import za.co.entelect.challenge.entities.Worm;
+import za.co.entelect.challenge.entities.worm.Agent;
+import za.co.entelect.challenge.entities.worm.Technologist;
 import za.co.entelect.challenge.enums.CellType;
 import za.co.entelect.challenge.enums.Direction;
 
@@ -129,9 +130,19 @@ public class PlaneUtils {
 
     public static List<List<Cell>> getBananaBombRange() {
         GameState gameState = Bot.getGameState();
-        MyWorm ourAgent = gameState.myPlayer.getAgent();
+        Agent ourAgent = gameState.myPlayer.getAgent();
 
-        return constructFireDirectionLines(new Cell(ourAgent.position.x, ourAgent.position.y), ourAgent.weapon.range);
+        return constructFireDirectionLines(new Cell(ourAgent.position.x, ourAgent.position.y),
+                ourAgent.bananaBomb.range);
+
+    }
+
+    public static List<List<Cell>> getFreezerRange() {
+        GameState gameState = Bot.getGameState();
+        Technologist ourTechnologist = gameState.myPlayer.getTechnologist();
+
+        return constructFireDirectionLines(new Cell(ourTechnologist.position.x, ourTechnologist.position.y),
+                ourTechnologist.snowballs.range);
 
     }
 
