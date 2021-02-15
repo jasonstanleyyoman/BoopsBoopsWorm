@@ -33,7 +33,7 @@ public class WormUtils {
         for (int i = center.x - radius; i <= center.x + radius; i++) {
             for (int j = center.y - radius; j <= center.y + radius; j++) {
                 if (PlaneUtils.euclideanDistance(i, j, center.x, center.y) <= radius
-                        && gameState.map[j][i].type != CellType.AIR) {
+                        && gameState.map[j][i].type != CellType.DEEP_SPACE) {
                     cellShootingArea.add(GameUtils.lookup(i, j));
                 }
             }

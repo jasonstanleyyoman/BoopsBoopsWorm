@@ -67,7 +67,11 @@ public class PlaneUtils {
         return cells;
     }
 
-    public static List<List<Cell>> constructFireDirectionLines(Cell cell, int range) {
+    public static List<List<Cell>> constructFireDirectionLines(Position cell, int range) {
+        return constructFireDirectionLines(cell, range, false);
+    }
+
+    public static List<List<Cell>> constructFireDirectionLines(Position cell, int range, boolean considerDirt) {
         GameState gameState = Bot.getGameState();
         List<List<Cell>> directionLines = new ArrayList<>();
         for (Direction direction : Direction.values()) {
@@ -86,6 +90,10 @@ public class PlaneUtils {
 
                 Cell targetCell = gameState.map[coordinateY][coordinateX];
                 if (targetCell.type == CellType.AIR) {
+                    break;
+                }
+
+                if (considerDirt && targetCell.type == CellType.DIRT) {
                     break;
                 }
 

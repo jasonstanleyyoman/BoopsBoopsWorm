@@ -1,24 +1,14 @@
 package za.co.entelect.challenge;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import za.co.entelect.challenge.command.Command;
-import za.co.entelect.challenge.command.DigCommand;
-import za.co.entelect.challenge.command.MoveCommand;
-import za.co.entelect.challenge.command.SelectCommand;
-import za.co.entelect.challenge.command.ShootCommand;
-import za.co.entelect.challenge.common.GameUtils;
-import za.co.entelect.challenge.common.PlaneUtils;
-import za.co.entelect.challenge.common.StrategyUtils;
-import za.co.entelect.challenge.entities.Cell;
-import za.co.entelect.challenge.entities.GameState;
-import za.co.entelect.challenge.entities.MyWorm;
-import za.co.entelect.challenge.entities.Opponent;
-import za.co.entelect.challenge.entities.Worm;
-import za.co.entelect.challenge.enums.CellType;
+import za.co.entelect.challenge.command.*;
+import za.co.entelect.challenge.common.*;
+import za.co.entelect.challenge.entities.*;
+import za.co.entelect.challenge.entities.worm.*;
+import za.co.entelect.challenge.enums.*;
 
 public class Bot {
     private static Bot instance;
@@ -62,14 +52,14 @@ public class Bot {
         return getBot().state;
     }
 
-    private MyWorm getCurrentWorm() {
+    public MyWorm getCurrentWorm() {
         return Arrays.stream(gameState.myPlayer.worms).filter(myWorm -> myWorm.id == gameState.currentWormId)
                 .findFirst().get();
     }
 
     public Command run() {
         // Set worm target and set player worm to be selected
-        Worm targetWorm = StrategyUtils.setTargetWorm();
+        // Worm targetWorm = StrategyUtils.setTargetWorm();
 
         // List<Cell> fdLines = new ArrayList<>(8 * selectedWorm.weapon.range);
         // PlaneUtils.constructFireDirectionLines(GameUtils.lookup(selectedWorm.position),
@@ -79,39 +69,146 @@ public class Bot {
         // boolean canTarget = fdLines.stream().filter(c ->
         // c.equals(targetWorm.position)).findAny().isPresent();
 
-        Cell nextCell = PlaneUtils.nextLine(selectedWorm.position, targetWorm.position);
+        // Cell nextCell = PlaneUtils.nextLine(selectedWorm.position,
+        // targetWorm.position);
 
-        if (nextCell.type == CellType.DIRT) {
-            return new SelectCommand(selectedWorm, new DigCommand(nextCell));
-        }
-        return new SelectCommand(selectedWorm, new MoveCommand(nextCell));
+        // if (nextCell.type == CellType.DIRT) {
+        // return new SelectCommand(selectedWorm, new DigCommand(nextCell));
         // }
+        // return new SelectCommand(selectedWorm, new MoveCommand(nextCell));
+        // }
+        MyWorm currentWorm = getCurrentWorm();
 
-        // Strategi sekarang
-        // Jika ini bukan roundnya agent dan agent bisa nembak 2 target langsung, pake
-        // select aja (sekalian cek masih bisa select atau engga)
-        // Jika ini bukan roundnya technologist dan technologist bisa nembak 2 target
-        // langsung, pake select aja (sekalian cek masih bisa select atau engga)
+        if (getGameState().myPlayer.remainingWormSelections > 0) {
+            if (currentWorm.profession != Profession.AGENT) {
+                Cell targetCell = StrategyUtils.agentCanShootTwoWorms();
 
-        // Strategi individu agent
-        // Kalau ada yang bisa di banana bomb 2 langsung, gas aja
-        // Kalau ada yang bisa dibanana bomb mati, gas aja
-        // Kalau ada yang bisa ditembak, gas aja
-        // Cari target (Agent > Technologist > Commando)
-        // Gerak ke target
+                if (targetCell != null) {
+                    return new SelectCommand(currentWorm, new BananaCommand(targetCell));
+                }
+            }
 
-        // Strategi individu technologist
-        // Kalau ada yang bisa di freeze 2 langsung, gas aja
-        // Kalau ada yang bisa ditembak, tembak aja
-        // Cari target (Agent > Technologist > Commando)
-        // Kalau target bisa di freeze, freeze aja
-        // Kalau ada yang bisa ditembak, gas aja
-        // Gerak ke target
+            if (currentWorm.profession != Profession.TECHNOLOGIST) {
+                Cell targetCell = StrategyUtils.technologistCanShootTwoWorms();
 
-        // Strategi individu commando
-        // Kalau ada yang bisa ditembak, tembak aja
-        // Cari target (Agent > Technologist > Commando)
-        // Gerak ke target.
+                if (targetCell != null) {
+                    return new SelectCommand(currentWorm, new SnowballCommand(targetCell));
+                }
+            }
+        }
 
+        switch (currentWorm.profession) {
+            case AGENT:
+                // Strategi individu agent
+                // Kalau ada yang bisa di banana bomb 2 langsung, gas aja
+                // Kalau ada yang bisa dibanana bomb mati, gas aja
+                // Cari target (Agent > Technologist > Commando)
+                // Kalau target bisa di banana, gas aja
+                // Kalau ada yang bisa ditembak, gas aja
+                // Gerak ke target
+                Cell targetCell = StrategyUtils.agentCanShootTwoWorms();
+
+                if (targetCell != null) {
+                    return new BananaCommand(targetCell);
+                }
+
+                // target cell = ambil cell yang bisa banana musuh sampai mati (kalau ada yang
+                // ga kena teman,
+                // pilih cell itu aja, kalau terpaksa kena teman, yaudah gas aja)
+                if (targetCell != null) {
+                    return new BananaCommand(targetCell);
+                }
+                if (currentWorm.health < 21) {
+                    targetCell = StrategyUtils.desperateAgent();
+                    if (targetCell != null) {
+                        return new BananaCommand(targetCell);
+                    }
+                }
+                Worm target = StrategyUtils.setTargetWorm();
+
+                // targetCell = getArea(target); (cari cell yang bisa nembak target dan
+                // diusahakan ga kena teman)
+                if (targetCell != null) {
+                    return new BananaCommand(targetCell);
+                }
+                targetCell = StrategyUtils.getAvailableShoot(currentWorm);
+                if (targetCell != null) {
+                    Direction direction = PlaneUtils.resolveDirection(currentWorm.position, targetCell);
+                    return new ShootCommand(direction);
+                }
+                // Gerak ke target
+                Cell nextCell = PlaneUtils.nextLine(currentWorm.position, target.position);
+
+                if (nextCell.type == CellType.DIRT) {
+                    return new DigCommand(currentWorm, nextCell);
+                } else {
+                    return new MoveCommand(currentWorm, nextCell);
+                }
+                break;
+            case TECHNOLOGIST:
+                // Strategi individu technologist
+                // Kalau ada yang bisa di freeze 2 langsung, gas aja
+                // Cari target (Agent > Technologist > Commando)
+                // Kalau target bisa di freeze, freeze aja
+                // Kalau target bisa di tembak, gas aja
+                // Kalau ada yang bisa ditembak (selain target), gas aja
+                // Gerak ke target
+                Cell targetCell = StrategyUtils.technologistCanShootTwoWorms();
+
+                if (targetCell != null) {
+                    return new SnowballCommand(targetCell);
+                }
+
+                if (currentWorm.health < 21) {
+                    targetCell = StrategyUtils.desperateTechnologist();
+                    if (targetCell != null) {
+                        return new SnowballCommand(targetCell);
+                    }
+                }
+                Worm target = StrategyUtils.setTargetWorm();
+
+                // targetCell = getArea(target); (cari cell yang bisa snowball target dan
+                // diusahakan ga kena teman)
+                if (targetCell != null) {
+                    return new SnowballCommand(targetCell);
+                }
+                targetCell = StrategyUtils.getAvailableShoot(currentWorm);
+                if (targetCell != null) {
+                    Direction direction = PlaneUtils.resolveDirection(currentWorm.position, targetCell);
+                    return new ShootCommand(direction);
+                }
+                // Gerak ke target
+                Cell nextCell = PlaneUtils.nextLine(currentWorm.position, target.position);
+
+                if (nextCell.type == CellType.DIRT) {
+                    return new DigCommand(currentWorm, nextCell);
+                } else {
+                    return new MoveCommand(currentWorm, nextCell);
+                }
+                break;
+            case COMMANDO:
+                // Strategi individu commando
+                // Kalau ada yang bisa ditembak, tembak aja
+                // Cari target (Agent > Technologist > Commando)
+                // Gerak ke target.
+                Cell targetCell = StrategyUtils.getAvailableShoot(currentWorm);
+                if (targetCell != null) {
+                    Direction direction = PlaneUtils.resolveDirection(currentWorm.position, targetCell);
+                    return new ShootCommand(direction);
+                }
+
+                Worm target = StrategyUtils.setTargetWorm();
+
+                // Gerak ke target;
+                Cell nextCell = PlaneUtils.nextLine(currentWorm.position, target.position);
+
+                if (nextCell.type == CellType.DIRT) {
+                    return new DigCommand(currentWorm, nextCell);
+                } else {
+                    return new MoveCommand(currentWorm, nextCell);
+                }
+                break;
+        }
     }
+
 }
