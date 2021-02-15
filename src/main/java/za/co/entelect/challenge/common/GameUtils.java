@@ -3,6 +3,7 @@ package za.co.entelect.challenge.common;
 import za.co.entelect.challenge.Bot;
 import za.co.entelect.challenge.entities.Cell;
 import za.co.entelect.challenge.entities.GameState;
+import za.co.entelect.challenge.entities.Position;
 
 public class GameUtils {
 
@@ -18,7 +19,7 @@ public class GameUtils {
         return new Cell(gameState.map[y][x]);
     }
 
-    public static Cell lookup(Cell cell) {
+    public static Cell lookup(Position cell) {
         if (!isValidCoordinate(cell.x, cell.y))
             return null;
         GameState gameState = Bot.getGameState();

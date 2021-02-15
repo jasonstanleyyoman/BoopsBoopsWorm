@@ -1,6 +1,6 @@
 {
   "maxRounds": 400,
-  "maxDoNothings": 12,
+  "maxDoNothings": 2,
   "commandoWorms": {
     "count": 1,
     "initialHp": 150,

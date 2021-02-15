@@ -32,7 +32,7 @@ public class WormUtils {
         List<Cell> cellShootingArea = new ArrayList<>();
         for (int i = center.x - radius; i <= center.x + radius; i++) {
             for (int j = center.y - radius; j <= center.y + radius; j++) {
-                if (PlaneUtils.realEuclideanDistance(i, j, center.x, center.y) <= radius
+                if (PlaneUtils.euclideanDistance(i, j, center.x, center.y) <= radius
                         && gameState.map[j][i].type != CellType.AIR) {
                     cellShootingArea.add(GameUtils.lookup(i, j));
                 }

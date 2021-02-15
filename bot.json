@@ -2,7 +2,7 @@
 	"author": "Boops Boops",
 	"email": "James.James@example.com",
 	"nickName": "BoopsBoops",
-	"botLocation": "/target",
-	"botFileName": "bot.jar",
+	"botLocation": "target",
+	"botFileName": "bot-jar-with-dependencies.jar",
 	"botLanguage": "java"
 }

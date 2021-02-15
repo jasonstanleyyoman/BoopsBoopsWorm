@@ -6,7 +6,6 @@ import java.util.List;
 import za.co.entelect.challenge.Bot;
 import za.co.entelect.challenge.entities.Cell;
 import za.co.entelect.challenge.entities.GameState;
-import za.co.entelect.challenge.entities.MyWorm;
 import za.co.entelect.challenge.entities.Position;
 import za.co.entelect.challenge.entities.worm.Agent;
 import za.co.entelect.challenge.entities.worm.Technologist;
