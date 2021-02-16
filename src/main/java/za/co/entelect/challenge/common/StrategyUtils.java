@@ -380,4 +380,138 @@ public class StrategyUtils {
 
     }
 
+    public static Cell bananaCanKill () {
+        if (!WormUtils.isAlive(Bot.getGameState().myPlayer.getAgent())) {
+            return null;
+        }
+        if (Bot.getGameState().myPlayer.getAgent().bananaBomb.count <= 0) {
+            return null;
+        }
+
+        List<Cell> bananaRange = new ArrayList<>();
+        PlaneUtils.getBananaBombRange().forEach(l -> bananaRange.addAll(l));
+
+        int friendEffected = 10;
+        int enemyEffected = 0;
+        Cell choosenCell = new Cell(0, 0);
+        for (Cell banana : bananaRange) {
+            List<Cell> shootingRange = WormUtils.getShootingArea(banana, 2);
+            int curFriendEffected = 0;
+            int curEnemyEffected = 0;
+
+            for (Cell shoot : shootingRange) {
+                for (Worm ourWorm : Bot.getMyWormList()) {
+                    if (ourWorm.position.equals(shoot) && WormUtils.isAlive(ourWorm)) {
+                        curFriendEffected += 1;
+                    }
+                }
+
+                for (Worm enemyWorm : Bot.getOpponentWorms()) {
+                    if (enemyWorm.position.equals(shoot) && WormUtils.isAlive(enemyWorm) && enemyWorm.health <= 21) {
+                        curEnemyEffected += 1;
+                    }
+                }
+            }
+
+            if (curFriendEffected <= friendEffected && curEnemyEffected >= enemyEffected) {
+                choosenCell = banana;
+                friendEffected = curFriendEffected;
+                enemyEffected = curEnemyEffected;
+            }
+
+        }
+        if (enemyEffected > 0) {
+            return choosenCell;
+        }
+        return null;
+
+    }
+
+    public static Cell bananaHitTarget (Worm target) {
+        if (!WormUtils.isAlive(Bot.getGameState().myPlayer.getAgent())) {
+            return null;
+        }
+        if (Bot.getGameState().myPlayer.getAgent().bananaBomb.count <= 0) {
+            return null;
+        }
+
+        List<Cell> bananaRange = new ArrayList<>();
+        PlaneUtils.getBananaBombRange().forEach(l -> bananaRange.addAll(l));
+
+        int friendEffected = 10;
+        boolean canHitTarget = false;
+        Cell choosenCell = new Cell(0, 0);
+        for (Cell banana : bananaRange) {
+            List<Cell> shootingRange = WormUtils.getShootingArea(banana, 2);
+            int curFriendEffected = 0;
+            boolean targetHitted = false;
+            for (Cell shoot : shootingRange) {
+                for (Worm ourWorm : Bot.getMyWormList()) {
+                    if (ourWorm.position.equals(shoot) && WormUtils.isAlive(ourWorm)) {
+                        curFriendEffected += 1;
+                    }
+                }
+
+                if (target.position.equals(shoot)) {
+                    targetHitted = true;
+                }
+            }
+
+            if (curFriendEffected <= friendEffected && targetHitted) {
+                choosenCell = banana;
+                friendEffected = curFriendEffected;
+                canHitTarget = true;
+            }
+
+        }
+        if (canHitTarget) {
+            return choosenCell;
+        }
+        return null;
+    }
+
+    public static Cell freezeHitTarget (Worm target) {
+        if (!WormUtils.isAlive(Bot.getGameState().myPlayer.getTechnologist())) {
+            return null;
+        }
+        if (Bot.getGameState().myPlayer.getAgent().snowballs.count <= 0) {
+            return null;
+        }
+
+        List<Cell> freezerRange = new ArrayList<>();
+        PlaneUtils.getFreezerRange().forEach(l -> freezerRange.addAll(l));
+
+        int friendEffected = 10;
+        boolean canHitTarget = false;
+        Cell choosenCell = new Cell(0, 0);
+        for (Cell freeze : freezerRange) {
+            List<Cell> shootingRange = WormUtils.getShootingArea(freeze, 1);
+            int curFriendEffected = 0;
+            boolean targetHitted = false;
+            for (Cell shoot : shootingRange) {
+                for (Worm ourWorm : Bot.getMyWormList()) {
+                    if (ourWorm.position.equals(shoot) && WormUtils.isAlive(ourWorm)) {
+                        curFriendEffected += 1;
+                    }
+                }
+
+                if (target.position.equals(shoot)) {
+                    targetHitted = true;
+                }
+            }
+
+            if (curFriendEffected <= friendEffected && targetHitted) {
+                choosenCell = freeze;
+                friendEffected = curFriendEffected;
+                canHitTarget = true;
+            }
+
+        }
+        if (canHitTarget) {
+            return choosenCell;
+        }
+        return null;
+    }
+
+
 }

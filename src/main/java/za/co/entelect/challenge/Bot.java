@@ -111,10 +111,10 @@ public class Bot {
                 if (targetCell != null) {
                     return new BananaCommand(targetCell);
                 }
-
                 // target cell = ambil cell yang bisa banana musuh sampai mati (kalau ada yang
                 // ga kena teman,
                 // pilih cell itu aja, kalau terpaksa kena teman, yaudah gas aja)
+                targetCell = StrategyUtils.bananaCanKill();
                 if (targetCell != null) {
                     return new BananaCommand(targetCell);
                 }
@@ -126,8 +126,12 @@ public class Bot {
                 }
                 Worm target = StrategyUtils.setTargetWorm();
 
+                
                 // targetCell = getArea(target); (cari cell yang bisa nembak target dan
                 // diusahakan ga kena teman)
+
+                targetCell = StrategyUtils.bananaHitTarget(target);
+                
                 if (targetCell != null) {
                     return new BananaCommand(targetCell);
                 }
@@ -169,6 +173,7 @@ public class Bot {
 
                 // targetCell = getArea(target); (cari cell yang bisa snowball target dan
                 // diusahakan ga kena teman)
+                targetCell = StrategyUtils.freezeHitTarget(target);
                 if (targetCell != null) {
                     return new SnowballCommand(targetCell);
                 }
