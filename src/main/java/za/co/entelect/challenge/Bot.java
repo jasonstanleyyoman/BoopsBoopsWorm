@@ -58,6 +58,10 @@ public class Bot {
     }
 
     public Command run() {
+        Worm enemyCommando = Bot.getOpponentWorms().stream().filter(w -> w.profession == Profession.COMMANDO)
+                .findFirst().orElse(new Worm(Profession.COMMANDO));
+        Worm enemyTechnologist = Bot.getOpponentWorms().stream().filter(w -> w.profession == Profession.TECHNOLOGIST)
+                .findFirst().orElse(new Worm(Profession.TECHNOLOGIST));
         // Set worm target and set player worm to be selected
         // Worm targetWorm = StrategyUtils.setTargetWorm();
 
@@ -110,7 +114,9 @@ public class Bot {
                 targetCell = StrategyUtils.agentCanShootTwoWorms();
 
                 if (!isAgentMoving) {
-                    isAgentMoving = StrategyUtils.agentStartsMoving();
+                    isAgentMoving = StrategyUtils.agentStartsMoving()
+                            || PlaneUtils.realEuclideanDistance(currentWorm.position, enemyCommando.position) <= 10
+                            || PlaneUtils.realEuclideanDistance(currentWorm.position, enemyTechnologist.position) <= 10;
                     return new DoNothingCommand();
                 }
                 if (targetCell != null) {
@@ -144,8 +150,12 @@ public class Bot {
                     Direction direction = PlaneUtils.resolveDirection(currentWorm.position, targetCell);
                     return new ShootCommand(direction);
                 }
+
+                Cell nextCell = StrategyUtils.nearHealthPack(currentWorm.position);
                 // Gerak ke target
-                Cell nextCell = PlaneUtils.nextLine(currentWorm.position, target.position);
+                if (nextCell == null) {
+                    nextCell = PlaneUtils.nextLine(currentWorm.position, target.position);
+                }
 
                 if (nextCell.type == CellType.DIRT) {
                     return new DigCommand(nextCell);
@@ -185,8 +195,10 @@ public class Bot {
                     Direction direction = PlaneUtils.resolveDirection(currentWorm.position, targetCell);
                     return new ShootCommand(direction);
                 }
-                // Gerak ke target
-                nextCell = PlaneUtils.nextLine(currentWorm.position, target.position);
+                nextCell = StrategyUtils.nearHealthPack(currentWorm.position);
+                if (nextCell == null) {
+                    nextCell = PlaneUtils.nextLine(currentWorm.position, target.position);
+                }
 
                 if (nextCell.type == CellType.DIRT) {
                     return new DigCommand(nextCell);
@@ -207,7 +219,10 @@ public class Bot {
                 target = StrategyUtils.setTargetWorm();
 
                 // Gerak ke target;
-                nextCell = PlaneUtils.nextLine(currentWorm.position, target.position);
+                nextCell = StrategyUtils.nearHealthPack(currentWorm.position);
+                if (nextCell == null) {
+                    nextCell = PlaneUtils.nextLine(currentWorm.position, target.position);
+                }
 
                 if (nextCell.type == CellType.DIRT) {
                     return new DigCommand(nextCell);

@@ -2,7 +2,6 @@ package za.co.entelect.challenge.common;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import za.co.entelect.challenge.Bot;
 import za.co.entelect.challenge.entities.Cell;
@@ -146,7 +145,7 @@ public class StrategyUtils {
         int xtengah = (enemyCommando.position.x + enemyTechnologist.position.x) / 2;
         int ytengah = (enemyCommando.position.y + enemyTechnologist.position.y) / 2;
 
-        return (PlaneUtils.realEuclideanDistance(agent.position, new Position(xtengah, ytengah)) > PlaneUtils
+        return (PlaneUtils.realEuclideanDistance(agent.position, new Position(xtengah, ytengah)) + 5 > PlaneUtils
                 .realEuclideanDistance(enemyCommando.position, enemyTechnologist.position));
     }
 
@@ -403,15 +402,25 @@ public class StrategyUtils {
             int curFriendEffected = 0;
             boolean targetHitted = false;
             for (Cell shoot : shootingRange) {
-                for (Worm ourWorm : Bot.getMyWormList()) {
+                boolean canBeHitted = false;
+                for (MyWorm ourWorm : Bot.getMyWormList()) {
+                    List<Cell> shootRange = new ArrayList<>();
+                    PlaneUtils.constructFireDirectionLines(ourWorm.position, ourWorm.weapon.range, true)
+                            .forEach(l -> shootRange.addAll(l));
+                    for (Cell range : shootRange) {
+                        if (range.equals(target.position)) {
+                            canBeHitted = true;
+                        }
+                    }
                     if (ourWorm.position.equals(shoot) && WormUtils.isAlive(ourWorm)) {
                         curFriendEffected += 1;
                     }
                 }
 
-                if (target.position.equals(shoot)) {
+                if (target.position.equals(shoot) && canBeHitted) {
                     targetHitted = true;
                 }
+
             }
 
             if (curFriendEffected <= friendEffected && targetHitted) {
@@ -423,6 +432,16 @@ public class StrategyUtils {
         }
         if (canHitTarget) {
             return choosenCell;
+        }
+        return null;
+    }
+
+    public static Cell nearHealthPack(Position center) {
+        List<Cell> surroundingCell = PlaneUtils.getSurroundingCells(center.x, center.y);
+        for (Cell cell : surroundingCell) {
+            if (GameUtils.lookup(cell).powerUp != null) {
+                return cell;
+            }
         }
         return null;
     }
