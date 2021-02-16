@@ -25,15 +25,4 @@ public class Cell extends Position {
     @SerializedName("powerup")
     public PowerUp powerUp;
 
-    @Override
-    public Cell modifyX(int dx) {
-        this.x += dx;
-        return this;
-    }
-
-    @Override
-    public Cell modifyY(int dy) {
-        this.y += dy;
-        return this;
-    }
 }

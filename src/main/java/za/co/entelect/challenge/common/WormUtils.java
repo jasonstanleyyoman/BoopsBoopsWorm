@@ -28,13 +28,16 @@ public class WormUtils {
     }
 
     public static List<Cell> getShootingArea(Cell center, int radius) {
-        GameState gameState = Bot.getGameState();
         List<Cell> cellShootingArea = new ArrayList<>();
+        cellShootingArea.add(center);
         for (int i = center.x - radius; i <= center.x + radius; i++) {
             for (int j = center.y - radius; j <= center.y + radius; j++) {
+                Cell now = GameUtils.lookup(i, j);
+                if (now == null)
+                    continue;
                 if (PlaneUtils.euclideanDistance(i, j, center.x, center.y) <= radius
-                        && gameState.map[j][i].type != CellType.DEEP_SPACE) {
-                    cellShootingArea.add(GameUtils.lookup(i, j));
+                        && now.type != CellType.DEEP_SPACE) {
+                    cellShootingArea.add(now);
                 }
             }
         }

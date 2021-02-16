@@ -1,15 +1,13 @@
 package za.co.entelect.challenge.common;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import za.co.entelect.challenge.Bot;
 import za.co.entelect.challenge.entities.Cell;
 import za.co.entelect.challenge.entities.MyWorm;
+import za.co.entelect.challenge.entities.Position;
 import za.co.entelect.challenge.entities.Worm;
 import za.co.entelect.challenge.enums.Profession;
 
@@ -23,57 +21,19 @@ public class StrategyUtils {
 
         if (WormUtils.isAlive(enemyAgent)) {
             return enemyAgent;
-        } else if (WormUtils.isAlive(enemyTechno)) {
-            return enemyTechno;
-        } else {
+        } else if (WormUtils.isAlive(enemyCommando)) {
             return enemyCommando;
+        } else {
+            return enemyTechno;
         }
-    }
-
-    public static boolean isTheMinimum(double a, double b, double c) {
-        return (a <= b) && (a <= c);
-    }
-
-    public static MyWorm findClosestPlayerWorm(Worm enemyWorm) {
-        MyWorm commando = Bot.getGameState().myPlayer.getCommando();
-        MyWorm technologist = Bot.getGameState().myPlayer.getTechnologist();
-        MyWorm agent = Bot.getGameState().myPlayer.getAgent();
-
-        double distanceToCommando = PlaneUtils.realEuclideanDistance(enemyWorm.position, commando.position);
-        double distanceToTechno = PlaneUtils.realEuclideanDistance(enemyWorm.position, technologist.position);
-        double distanceToAgent = PlaneUtils.realEuclideanDistance(enemyWorm.position, agent.position);
-
-        if (isTheMinimum(distanceToAgent, distanceToCommando, distanceToTechno) && WormUtils.isAlive(agent)) {
-            if (distanceToAgent < 10) {
-                return agent;
-            } else if (distanceToTechno <= distanceToCommando) {
-                return technologist;
-            } else {
-                return commando;
-            }
-        } else if (isTheMinimum(distanceToTechno, distanceToCommando, distanceToAgent)
-                && WormUtils.isAlive(technologist)) {
-            if (distanceToTechno < 10) {
-                return technologist;
-            } else if (distanceToAgent <= distanceToCommando) {
-                return agent;
-            } else {
-                return commando;
-            }
-        } else if (isTheMinimum(distanceToCommando, distanceToTechno, distanceToAgent) && WormUtils.isAlive(commando)) {
-            if (distanceToCommando < 10) {
-                return commando;
-            } else if (distanceToAgent <= distanceToTechno) {
-                return agent;
-            } else {
-                return technologist;
-            }
-        }
-        return null;
     }
 
     public static Cell agentCanShootTwoWorms() {
         if (!WormUtils.isAlive(Bot.getGameState().myPlayer.getAgent())) {
+            return null;
+        }
+
+        if (Bot.getGameState().myPlayer.getAgent().bananaBomb.count <= 2) {
             return null;
         }
         List<Cell> bananaRange = new ArrayList<>();
@@ -87,16 +47,16 @@ public class StrategyUtils {
                 int curEnemyEffected = 0;
                 int curFriendEffected = 0;
                 for (Worm enemyWorm : Bot.getOpponentWorms()) {
-                    if (enemyWorm.position.equals(shoot)) {
+                    if (enemyWorm.position.equals(shoot) && WormUtils.isAlive(enemyWorm)) {
                         curEnemyEffected += 1;
                     }
                 }
                 for (Worm ourWorm : Bot.getMyWormList()) {
-                    if (ourWorm.position.equals(shoot)) {
+                    if (ourWorm.position.equals(shoot) && WormUtils.isAlive(ourWorm)) {
                         curFriendEffected += 1;
                     }
                 }
-                if (curEnemyEffected >= enemyEffected && curEnemyEffected >= 2 && curFriendEffected <= friendEffected) {
+                if (curEnemyEffected > enemyEffected && curEnemyEffected > 2 && curFriendEffected <= friendEffected) {
                     friendEffected = curFriendEffected;
                     enemyEffected = curEnemyEffected;
                     cell = banana;
@@ -111,6 +71,9 @@ public class StrategyUtils {
 
     public static Cell technologistCanShootTwoWorms() {
         if (!WormUtils.isAlive(Bot.getGameState().myPlayer.getTechnologist())) {
+            return null;
+        }
+        if (Bot.getGameState().myPlayer.getTechnologist().snowballs.count <= 2) {
             return null;
         }
         List<Cell> freezeRange = new ArrayList<>();
@@ -146,103 +109,20 @@ public class StrategyUtils {
         return null;
     }
 
-    public static Cell agentCanShootTargetToDie(Worm target) {
-        if (!WormUtils.isAlive(Bot.getGameState().myPlayer.getAgent())) {
-            return null;
-        }
-        if (Bot.getGameState().myPlayer.getAgent().bananaBomb.count <= 0) {
-            return null;
-        }
-        List<Cell> bananaRange = new ArrayList<>();
-        PlaneUtils.getBananaBombRange().forEach(l -> bananaRange.addAll(l));
-
-        boolean canShootTargetToDie = false;
-        int friendEffected = 10;
-        Cell choosenCell = new Cell(0, 0);
-
-        for (Cell banana : bananaRange) {
-            List<Cell> shootingRange = WormUtils.getShootingArea(banana, 2);
-            int curFriendEffected = 0;
-            for (Cell shoot : shootingRange) {
-
-                curFriendEffected = Bot.getMyWormList().stream().filter(w -> {
-                    return w.position.equals(shoot) && WormUtils.isAlive(w);
-                }).collect(Collectors.toList()).size();
-
-                if (target.position.equals(shoot) && target.health <= 20 && curFriendEffected < friendEffected) {
-                    canShootTargetToDie = true;
-                    choosenCell = banana;
-                    friendEffected = curFriendEffected;
-                }
-            }
-        }
-        if (canShootTargetToDie) {
-            return choosenCell;
-        }
-        return null;
-    }
-
-    public static Cell technologistCanFreezeTarget(Worm target) {
-        if (!WormUtils.isAlive(Bot.getGameState().myPlayer.getTechnologist())) {
-            return null;
-        }
-        if (Bot.getGameState().myPlayer.getTechnologist().snowballs.count <= 0) {
-            return null;
-        }
-        if (target.roundsUntilUnfrozen > 0) {
-            return null;
-        }
-        boolean canFreeze = false;
-        int friendEffected = 10;
-
-        Cell selectedCell = new Cell(0, 0);
-
-        List<Cell> freezeTarget = new ArrayList<>();
-        PlaneUtils.getFreezerRange().forEach(l -> freezeTarget.addAll(l));
-
-        for (Cell freeze : freezeTarget) {
-            int curFriendEffected = 0;
-            boolean kenaMusuh = false;
-
-            List<Cell> shootingRange = WormUtils.getShootingArea(freeze, 1);
-
-            for (Cell shoot : shootingRange) {
-                for (Worm ourWorm : Bot.getMyWormList()) {
-                    if (ourWorm.position.equals(shoot) && WormUtils.isAlive(ourWorm)) {
-                        curFriendEffected += 1;
-                    }
-                }
-
-                if (target.position.equals(shoot)) {
-                    kenaMusuh = true;
-                }
-
-                if (curFriendEffected < friendEffected && kenaMusuh) {
-                    friendEffected = curFriendEffected;
-                    canFreeze = true;
-                    selectedCell = freeze;
-                }
-            }
-        }
-        if (canFreeze) {
-            return selectedCell;
-        }
-
-        return null;
-
-    }
-
-    public Cell getAvailableShoot(MyWorm worm) {
+    public static Cell getAvailableShoot(MyWorm worm) {
         boolean canHitTarget = false;
         Cell selectedCell;
         List<Cell> shootingArea = new ArrayList<>();
         PlaneUtils.constructFireDirectionLines(worm.position, worm.weapon.range, true)
                 .forEach(l -> shootingArea.addAll(l));
-
-        Stream<Cell> sCell = shootingArea.stream()
-                .filter(c -> Bot.getOpponentWorms().stream().filter(w -> c.equals(w.position)).findFirst().isPresent());
-        canHitTarget = sCell.findFirst().isPresent();
-        selectedCell = sCell.findFirst().orElse(new Cell(0, 0));
+        canHitTarget = shootingArea
+                .stream().filter(c -> Bot.getOpponentWorms().stream()
+                        .filter(w -> c.equals(w.position) && WormUtils.isAlive(w)).findFirst().isPresent())
+                .findFirst().isPresent();
+        selectedCell = shootingArea
+                .stream().filter(c -> Bot.getOpponentWorms().stream()
+                        .filter(w -> c.equals(w.position) && WormUtils.isAlive(w)).findFirst().isPresent())
+                .findFirst().orElse(new Cell(0, 0));
 
         if (canHitTarget) {
             return selectedCell;
@@ -250,43 +130,72 @@ public class StrategyUtils {
         return null;
     }
 
-    public static Cell agentCanShootEnemyToDie() {
-        if (!WormUtils.isAlive(Bot.getGameState().myPlayer.getAgent())) {
-            return null;
-        }
-        if (Bot.getGameState().myPlayer.getAgent().bananaBomb.count <= 0) {
-            return null;
-        }
-        List<Cell> bananaRange = new ArrayList<>();
-        PlaneUtils.getBananaBombRange().forEach(l -> bananaRange.addAll(l));
+    public static boolean agentStartsMoving() {
+        Worm agent = Bot.getMyWormList().stream().filter(w -> w.profession == Profession.AGENT).findFirst()
+                .orElse(null);
+        if (agent == null)
+            return true;
+        if (!WormUtils.isAlive(agent))
+            return true;
+        Worm enemyCommando = Bot.getOpponentWorms().stream().filter(w -> w.profession == Profession.COMMANDO)
+                .findFirst().orElse(new Worm(Profession.COMMANDO));
+        Worm enemyTechnologist = Bot.getOpponentWorms().stream().filter(w -> w.profession == Profession.TECHNOLOGIST)
+                .findFirst().orElse(new Worm(Profession.TECHNOLOGIST));
+        if (!WormUtils.isAlive(enemyCommando) || !WormUtils.isAlive(enemyTechnologist))
+            return true;
+        int xtengah = (enemyCommando.position.x + enemyTechnologist.position.x) / 2;
+        int ytengah = (enemyCommando.position.y + enemyTechnologist.position.y) / 2;
 
-        boolean canShootTargetToDie = false;
-        int friendEffected = 10;
-        Cell choosenCell = new Cell(0, 0);
-
-        for (Cell banana : bananaRange) {
-            List<Cell> shootingRange = WormUtils.getShootingArea(banana, 2);
-            int curFriendEffected = 0;
-            for (Cell shoot : shootingRange) {
-
-                curFriendEffected = Bot.getMyWormList().stream().filter(w -> {
-                    return w.position.equals(shoot) && WormUtils.isAlive(w);
-                }).collect(Collectors.toList()).size();
-
-                if (target.position.equals(shoot) && target.health <= 20 && curFriendEffected < friendEffected) {
-                    canShootTargetToDie = true;
-                    choosenCell = banana;
-                    friendEffected = curFriendEffected;
-                }
-            }
-        }
-        if (canShootTargetToDie) {
-            return choosenCell;
-        }
-        return null;
+        return (PlaneUtils.realEuclideanDistance(agent.position, new Position(xtengah, ytengah)) > PlaneUtils
+                .realEuclideanDistance(enemyCommando.position, enemyTechnologist.position));
     }
 
-    public Cell desperateAgent() {
+    // public static Cell agentCanShootEnemyToDie() {
+    // if (!WormUtils.isAlive(Bot.getGameState().myPlayer.getAgent())) {
+    // return null;
+
+    // public static Cell agentCanShootEnemyToDie() {
+    // if (!WormUtils.isAlive(Bot.getGameState().myPlayer.getAgent())) {
+    // return null;
+
+    // public static Cell agentCanShootEnemyToDie() {
+    // if (!WormUtils.isAlive(Bot.getGameState().myPlayer.getAgent())) {
+    // return null;
+    // }
+    // if (Bot.getGameState().myPlayer.getAgent().bananaBomb.count <= 0) {
+    // return null;
+    // }
+    // List<Cell> bananaRange = new ArrayList<>();
+    // PlaneUtils.getBananaBombRange().forEach(l -> bananaRange.addAll(l));
+
+    // boolean canShootTargetToDie = false;
+    // int friendEffected = 10;
+    // Cell choosenCell = new Cell(0, 0);
+
+    // for (Cell banana : bananaRange) {
+    // List<Cell> shootingRange = WormUtils.getShootingArea(banana, 2);
+    // int curFriendEffected = 0;
+    // for (Cell shoot : shootingRange) {
+
+    // curFriendEffected = Bot.getMyWormList().stream().filter(w -> {
+    // return w.position.equals(shoot) && WormUtils.isAlive(w);
+    // }).collect(Collectors.toList()).size();
+
+    // if (target.position.equals(shoot) && target.health <= 20 && curFriendEffected
+    // < friendEffected) {
+    // canShootTargetToDie = true;
+    // choosenCell = banana;
+    // friendEffected = curFriendEffected;
+    // }
+    // }
+    // }
+    // if (canShootTargetToDie) {
+    // return choosenCell;
+    // }
+    // return null;
+    // }
+
+    public static Cell desperateAgent() {
         if (!WormUtils.isAlive(Bot.getGameState().myPlayer.getAgent())) {
             return null;
         }
@@ -301,7 +210,7 @@ public class StrategyUtils {
         int enemyEffected = 0;
         Cell choosenCell = new Cell(0, 0);
         for (Cell banana : bananaRange) {
-            List<Cell> shootingRange = WormUtils.getShootingArea(banana, 2);
+            List<Cell> shootingRange = WormUtils.getShootingArea(banana, 1);
             int curFriendEffected = 0;
             int curEnemyEffected = 0;
 
@@ -319,7 +228,7 @@ public class StrategyUtils {
                 }
             }
 
-            if (curFriendEffected <= friendEffected && curEnemyEffected >= enemyEffected) {
+            if (curFriendEffected <= friendEffected && curEnemyEffected > enemyEffected) {
                 choosenCell = banana;
                 friendEffected = curFriendEffected;
                 enemyEffected = curEnemyEffected;
@@ -333,7 +242,7 @@ public class StrategyUtils {
 
     }
 
-    public Cell desperateTechnologist() {
+    public static Cell desperateTechnologist() {
         if (!WormUtils.isAlive(Bot.getGameState().myPlayer.getTechnologist())) {
             return null;
         }
@@ -360,7 +269,8 @@ public class StrategyUtils {
                 }
 
                 for (Worm enemyWorm : Bot.getOpponentWorms()) {
-                    if (enemyWorm.position.equals(shoot) && WormUtils.isAlive(enemyWorm)) {
+                    if (enemyWorm.position.equals(shoot) && WormUtils.isAlive(enemyWorm)
+                            && enemyWorm.roundsUntilUnfrozen <= 0) {
                         curEnemyEffected += 1;
                     }
                 }
@@ -380,7 +290,7 @@ public class StrategyUtils {
 
     }
 
-    public static Cell bananaCanKill () {
+    public static Cell bananaCanKill() {
         if (!WormUtils.isAlive(Bot.getGameState().myPlayer.getAgent())) {
             return null;
         }
@@ -413,7 +323,7 @@ public class StrategyUtils {
                 }
             }
 
-            if (curFriendEffected <= friendEffected && curEnemyEffected >= enemyEffected) {
+            if (curFriendEffected <= friendEffected && curEnemyEffected > enemyEffected) {
                 choosenCell = banana;
                 friendEffected = curFriendEffected;
                 enemyEffected = curEnemyEffected;
@@ -427,7 +337,7 @@ public class StrategyUtils {
 
     }
 
-    public static Cell bananaHitTarget (Worm target) {
+    public static Cell bananaHitTarget(Worm target) {
         if (!WormUtils.isAlive(Bot.getGameState().myPlayer.getAgent())) {
             return null;
         }
@@ -470,11 +380,15 @@ public class StrategyUtils {
         return null;
     }
 
-    public static Cell freezeHitTarget (Worm target) {
+    public static Cell freezeHitTarget(Worm target) {
         if (!WormUtils.isAlive(Bot.getGameState().myPlayer.getTechnologist())) {
             return null;
         }
-        if (Bot.getGameState().myPlayer.getAgent().snowballs.count <= 0) {
+        if (Bot.getGameState().myPlayer.getTechnologist().snowballs.count <= 0) {
+            return null;
+        }
+
+        if (target.roundsUntilUnfrozen > 0) {
             return null;
         }
 
@@ -512,6 +426,5 @@ public class StrategyUtils {
         }
         return null;
     }
-
 
 }

@@ -2,7 +2,7 @@
   "round-state-output-location": "./match-logs",
   "game-config-file-location": "game-config.json",
   "game-engine-jar": "./ec-2019-game-engine-jvm-full-2019.3.2.jar",
-  "verbose-mode": true,
+  "verbose-mode": false,
   "max-runtime-ms": 1000,
   "player-a": "./",
   "player-b": "./reference-bot/javascript",

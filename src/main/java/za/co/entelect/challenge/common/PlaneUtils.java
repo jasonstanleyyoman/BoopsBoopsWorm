@@ -46,7 +46,6 @@ public class PlaneUtils {
         } else if (horizontalComponent > 0) {
             builder.append('E');
         }
-
         return Direction.valueOf(builder.toString());
     }
 
@@ -89,7 +88,7 @@ public class PlaneUtils {
                 }
 
                 Cell targetCell = gameState.map[coordinateY][coordinateX];
-                if (targetCell.type == CellType.AIR) {
+                if (targetCell.type == CellType.DEEP_SPACE) {
                     break;
                 }
 

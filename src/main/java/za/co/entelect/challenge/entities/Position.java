@@ -37,16 +37,6 @@ public class Position {
         return this.x == p.x && this.y == p.y;
     }
 
-    public Position modifyX(int dx) {
-        this.x += dx;
-        return this;
-    }
-
-    public Position modifyY(int dy) {
-        this.y += dy;
-        return this;
-    }
-
     public double distance(Position other) {
         return PlaneUtils.realEuclideanDistance(this.x, this.y, other.x, other.y);
     }

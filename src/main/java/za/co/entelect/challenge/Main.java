@@ -20,6 +20,7 @@ public class Main {
      *
      * @param args the args
      **/
+    @SuppressWarnings("all")
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         Gson gson = new Gson();
