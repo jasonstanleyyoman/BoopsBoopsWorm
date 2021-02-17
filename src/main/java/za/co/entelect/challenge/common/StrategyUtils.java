@@ -94,6 +94,10 @@ public class StrategyUtils {
         }
         if (maxVal >= 0.5D) {
             System.out.println("Agent can shoot two worm");
+            System.out.println("Ganti");
+            for (Cell cell : WormUtils.getShootingArea(max, 2)) {
+                System.out.println(cell.x + " " + cell.y);
+            }
             return max;
         }
         // for (Cell banana : bananaRange) {
