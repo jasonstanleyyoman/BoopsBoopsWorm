@@ -52,5 +52,5 @@ fabric.properties
 *.iml
 
 target/*
-match-logs
+# match-logs
 Visualizer

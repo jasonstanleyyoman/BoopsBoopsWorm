@@ -7,6 +7,8 @@ import java.util.Random;
 import za.co.entelect.challenge.command.*;
 import za.co.entelect.challenge.common.*;
 import za.co.entelect.challenge.entities.*;
+import za.co.entelect.challenge.entities.worm.Agent;
+import za.co.entelect.challenge.entities.worm.Technologist;
 import za.co.entelect.challenge.enums.*;
 
 public class Bot {
@@ -87,17 +89,18 @@ public class Bot {
         if (getGameState().myPlayer.remainingWormSelections > 0) {
             if (currentWorm.profession != Profession.AGENT) {
                 targetCell = StrategyUtils.agentCanShootTwoWorms();
-
+                Agent agent = getGameState().myPlayer.getAgent();
                 if (targetCell != null) {
-                    return new SelectCommand(currentWorm, new BananaCommand(targetCell));
+                    return new SelectCommand(agent, new BananaCommand(targetCell));
                 }
             }
 
             if (currentWorm.profession != Profession.TECHNOLOGIST) {
                 targetCell = StrategyUtils.technologistCanShootTwoWorms();
 
+                Technologist tech = getGameState().myPlayer.getTechnologist();
                 if (targetCell != null) {
-                    return new SelectCommand(currentWorm, new SnowballCommand(targetCell));
+                    return new SelectCommand(tech, new SnowballCommand(targetCell));
                 }
             }
         }
@@ -115,8 +118,8 @@ public class Bot {
 
                 if (!isAgentMoving) {
                     isAgentMoving = StrategyUtils.agentStartsMoving()
-                            || PlaneUtils.realEuclideanDistance(currentWorm.position, enemyCommando.position) <= 10
-                            || PlaneUtils.realEuclideanDistance(currentWorm.position, enemyTechnologist.position) <= 10;
+                            || StrategyUtils.countMove(currentWorm.position, enemyCommando.position) <= 7
+                            || StrategyUtils.countMove(currentWorm.position, enemyTechnologist.position) <= 7;
                     return new DoNothingCommand();
                 }
                 if (targetCell != null) {
@@ -135,16 +138,16 @@ public class Bot {
                         return new BananaCommand(targetCell);
                     }
                 }
-                Worm target = StrategyUtils.setTargetWorm();
+                Worm target = StrategyUtils.setTargetWorm(currentWorm);
 
                 // targetCell = getArea(target); (cari cell yang bisa nembak target dan
                 // diusahakan ga kena teman)
 
-                targetCell = StrategyUtils.bananaHitTarget(target);
+                // targetCell = StrategyUtils.bananaHitTarget(target);
 
-                if (targetCell != null) {
-                    return new BananaCommand(targetCell);
-                }
+                // if (targetCell != null) {
+                // return new BananaCommand(targetCell);
+                // }
                 targetCell = StrategyUtils.getAvailableShoot(currentWorm);
                 if (targetCell != null) {
                     Direction direction = PlaneUtils.resolveDirection(currentWorm.position, targetCell);
@@ -182,7 +185,7 @@ public class Bot {
                         return new SnowballCommand(targetCell);
                     }
                 }
-                target = StrategyUtils.setTargetWorm();
+                target = StrategyUtils.setTargetWorm(currentWorm);
 
                 // targetCell = getArea(ta+rget); (cari cell yang bisa snowball target dan
                 // diusahakan ga kena teman)
@@ -216,7 +219,7 @@ public class Bot {
                     return new ShootCommand(direction);
                 }
 
-                target = StrategyUtils.setTargetWorm();
+                target = StrategyUtils.setTargetWorm(currentWorm);
 
                 // Gerak ke target;
                 nextCell = StrategyUtils.nearHealthPack(currentWorm.position);

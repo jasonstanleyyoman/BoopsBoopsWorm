@@ -12,7 +12,6 @@ import za.co.entelect.challenge.Bot;
 import za.co.entelect.challenge.entities.Cell;
 import za.co.entelect.challenge.entities.GameState;
 import za.co.entelect.challenge.entities.MyWorm;
-import za.co.entelect.challenge.entities.Position;
 import za.co.entelect.challenge.entities.Worm;
 import za.co.entelect.challenge.entities.worm.Commando;
 import za.co.entelect.challenge.entities.worm.Technologist;
@@ -98,18 +97,6 @@ public class WormUtils {
         } catch (NoSuchElementException | NullPointerException ignored) {
         }
         return null;
-    }
-
-    public static Worm getFurthestWorm(List<MyWorm> wormList, Position position) {
-        double distance = PlaneUtils.realEuclideanDistance(wormList.get(0).position, position);
-        Worm currentWorm = wormList.remove(0);
-        for (Worm w : wormList) {
-            if (PlaneUtils.realEuclideanDistance(w.position, position) > distance) {
-                currentWorm = w;
-                distance = PlaneUtils.realEuclideanDistance(w.position, position);
-            }
-        }
-        return currentWorm;
     }
 
     public static Worm getEnemy(Profession pr) {
