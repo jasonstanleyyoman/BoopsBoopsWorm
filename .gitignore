@@ -54,3 +54,5 @@ fabric.properties
 target/*
 # match-logs
 Visualizer
+dump.txt
+dump2.txt
