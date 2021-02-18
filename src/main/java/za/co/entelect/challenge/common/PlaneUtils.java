@@ -152,4 +152,46 @@ public class PlaneUtils {
 
     }
 
+	public static List<Cell> getShootingArea(Cell center, int radius) {
+	    List<Cell> cellShootingArea = new ArrayList<>();
+	    cellShootingArea.add(center);
+	    for (int i = center.x - radius; i <= center.x + radius; i++) {
+	        for (int j = center.y - radius; j <= center.y + radius; j++) {
+	            Cell now = GameUtils.lookup(i, j);
+	            if (now == null)
+	                continue;
+	            if (Math.round(realEuclideanDistance(i, j, center.x, center.y)) <= radius
+	                    && now.type != CellType.DEEP_SPACE && !center.equals(now)) {
+	                cellShootingArea.add(now);
+	            }
+	        }
+	    }
+	
+	    return cellShootingArea;
+	}
+
+	public static List<Cell> getBananaArea(Cell center) {
+	    List<Cell> shootingArea = getShootingArea(center, 1);
+	    Cell northCell = GameUtils.lookup(center.x, center.y - 2);
+	    if (northCell != null && northCell.type != CellType.DEEP_SPACE) {
+	        shootingArea.add(northCell);
+	    }
+	
+	    Cell southCell = GameUtils.lookup(center.x, center.y + 2);
+	    if (southCell != null && southCell.type != CellType.DEEP_SPACE) {
+	        shootingArea.add(southCell);
+	    }
+	
+	    Cell westCell = GameUtils.lookup(center.x - 2, center.y);
+	    if (westCell != null && westCell.type != CellType.DEEP_SPACE) {
+	        shootingArea.add(westCell);
+	    }
+	
+	    Cell eastCell = GameUtils.lookup(center.x + 2, center.y);
+	    if (eastCell != null && eastCell.type != CellType.DEEP_SPACE) {
+	        shootingArea.add(eastCell);
+	    }
+	    return shootingArea;
+	}
+
 }

@@ -20,6 +20,7 @@ public class Bot {
 
     public Bot(Random newrandom, String newState, GameState newgameState) {
         instance = null;
+        
         instance = this;
         this.random = newrandom;
         this.state = newState;
@@ -60,31 +61,9 @@ public class Bot {
     }
 
     public Command run() {
-        Worm enemyCommando = Bot.getOpponentWorms().stream().filter(w -> w.profession == Profession.COMMANDO)
-                .findFirst().orElse(new Worm(Profession.COMMANDO));
-        Worm enemyTechnologist = Bot.getOpponentWorms().stream().filter(w -> w.profession == Profession.TECHNOLOGIST)
-                .findFirst().orElse(new Worm(Profession.TECHNOLOGIST));
-        Worm enemyAgent = Bot.getOpponentWorms().stream().filter(w -> w.profession == Profession.AGENT)
-                .findFirst().orElse(new Worm(Profession.AGENT));
-        // Set worm target and set player worm to be selected
-        // Worm targetWorm = StrategyUtils.setTargetWorm();
-
-        // List<Cell> fdLines = new ArrayList<>(8 * selectedWorm.weapon.range);
-        // PlaneUtils.constructFireDirectionLines(GameUtils.lookup(selectedWorm.position),
-        // selectedWorm.weapon.range)
-        // .forEach(l -> fdLines.addAll(l));
-
-        // boolean canTarget = fdLines.stream().filter(c ->
-        // c.equals(targetWorm.position)).findAny().isPresent();
-
-        // Cell nextCell = PlaneUtils.nextLine(selectedWorm.position,
-        // targetWorm.position);
-
-        // if (nextCell.type == CellType.DIRT) {
-        // return new SelectCommand(selectedWorm, new DigCommand(nextCell));
-        // }
-        // return new SelectCommand(selectedWorm, new MoveCommand(nextCell));
-        // }
+        Worm enemyCommando = WormUtils.getEnemyCommando();
+        Worm enemyTechnologist = WormUtils.getEnemyTechnologist();
+        Worm enemyAgent = WormUtils.getEnemyAgent();
         Cell targetCell;
         MyWorm currentWorm = getCurrentWorm();
 
@@ -109,13 +88,6 @@ public class Bot {
 
         switch (currentWorm.profession) {
             case AGENT:
-                // Strategi individu agent
-                // Kalau ada yang bisa di banana bomb 2 langsung, gas aja
-                // Kalau ada yang bisa dibanana bomb mati, gas aja
-                // Cari target (Agent > Technologist > Commando)
-                // Kalau target bisa di banana, gas aja
-                // Kalau ada yang bisa ditembak, gas aja
-                // Gerak ke target
                 targetCell = StrategyUtils.agentCanShootTwoWorms();
 
                 if (!isAgentMoving) {
@@ -127,9 +99,7 @@ public class Bot {
                 if (targetCell != null) {
                     return new BananaCommand(targetCell);
                 }
-                // target cell = ambil cell yang bisa banana musuh sampai mati (kalau ada yang
-                // ga kena teman,
-                // pilih cell itu aja, kalau terpaksa kena teman, yaudah gas aja)
+                
                 targetCell = StrategyUtils.bananaCanKill();
                 if (targetCell != null) {
                     return new BananaCommand(targetCell);
@@ -141,9 +111,6 @@ public class Bot {
                     }
                 }
                 Worm target = StrategyUtils.setTargetWorm(currentWorm);
-
-                // targetCell = getArea(target); (cari cell yang bisa nembak target dan
-                // diusahakan ga kena teman)
 
                 targetCell = StrategyUtils.bananaHitTarget(target);
 
@@ -157,7 +124,7 @@ public class Bot {
                 }
 
                 Cell nextCell = StrategyUtils.nearHealthPack(currentWorm.position);
-                // Gerak ke target
+
                 if (nextCell == null) {
                     nextCell = PlaneUtils.nextLine(currentWorm.position, target.position);
                 }
@@ -168,13 +135,7 @@ public class Bot {
                     return new MoveCommand(nextCell);
                 }
             case TECHNOLOGIST:
-                // Strategi individu technologist
-                // Kalau ada yang bisa di freeze 2 langsung, gas aja
-                // Cari target (Agent > Technologist > Commando)
-                // Kalau target bisa di freeze, freeze aja
-                // Kalau target bisa di tembak, gas aja
-                // Kalau ada yang bisa ditembak (selain target), gas aja
-                // Gerak ke target
+
                 targetCell = StrategyUtils.technologistCanShootTwoWorms();
 
                 if (targetCell != null) {
@@ -189,8 +150,6 @@ public class Bot {
                 }
                 target = StrategyUtils.setTargetWorm(currentWorm);
 
-                // targetCell = getArea(ta+rget); (cari cell yang bisa snowball target dan
-                // diusahakan ga kena teman)
                 targetCell = StrategyUtils.freezeHitTarget(target);
                 if (targetCell != null) {
                     return new SnowballCommand(targetCell);
@@ -229,7 +188,6 @@ public class Bot {
                     target = StrategyUtils.setTargetWorm(currentWorm);
                 }
 
-                // Gerak ke target;
                 nextCell = StrategyUtils.nearHealthPack(currentWorm.position);
                 if (nextCell == null) {
                     nextCell = PlaneUtils.nextLine(currentWorm.position, target.position);
