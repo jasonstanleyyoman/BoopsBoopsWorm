@@ -217,7 +217,15 @@ public class Bot {
                         Direction direction = PlaneUtils.resolveDirection(currentWorm.position, targetCell);
                         return new ShootCommand(direction);
                     }    
-                }           
+                } else {
+                    if (PlaneUtils.realEuclideanDistance(currentWorm.position, enemyAgent.position) <= 4){
+                        targetCell = StrategyUtils.getAvailableShoot(currentWorm);
+                            if (targetCell != null) {
+                            Direction direction = PlaneUtils.resolveDirection(currentWorm.position, targetCell);
+                            return new ShootCommand(direction);
+                        } 
+                    }
+                }   
 
                 target = StrategyUtils.setTargetWorm(currentWorm);
 
