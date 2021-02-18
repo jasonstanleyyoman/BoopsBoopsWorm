@@ -8,6 +8,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import java.lang.Math;
+
 import za.co.entelect.challenge.Bot;
 import za.co.entelect.challenge.entities.Cell;
 import za.co.entelect.challenge.entities.GameState;
@@ -34,7 +36,7 @@ public class WormUtils {
                 Cell now = GameUtils.lookup(i, j);
                 if (now == null)
                     continue;
-                if (PlaneUtils.euclideanDistance(i, j, center.x, center.y) <= radius
+                if (Math.round(PlaneUtils.realEuclideanDistance(i, j, center.x, center.y)) <= radius
                         && now.type != CellType.DEEP_SPACE) {
                     cellShootingArea.add(now);
                 }
@@ -42,6 +44,30 @@ public class WormUtils {
         }
 
         return cellShootingArea;
+    }
+
+    public static List<Cell> getBananaArea(Cell center) {
+        List<Cell> shootingArea = getShootingArea(center, 1);
+        Cell northCell = GameUtils.lookup(center.x, center.y - 2);
+        if (northCell != null && northCell.type != CellType.DEEP_SPACE) {
+            shootingArea.add(northCell);
+        }
+
+        Cell southCell = GameUtils.lookup(center.x, center.y + 2);
+        if (southCell != null && southCell.type != CellType.DEEP_SPACE) {
+            shootingArea.add(southCell);
+        }
+
+        Cell westCell = GameUtils.lookup(center.x - 2, center.y);
+        if (westCell != null && westCell.type != CellType.DEEP_SPACE) {
+            shootingArea.add(westCell);
+        }
+
+        Cell eastCell = GameUtils.lookup(center.x + 2, center.y);
+        if (eastCell != null && eastCell.type != CellType.DEEP_SPACE) {
+            shootingArea.add(eastCell);
+        }
+        return shootingArea;
     }
 
     public static int getWormInRange(Cell center, int radius) {

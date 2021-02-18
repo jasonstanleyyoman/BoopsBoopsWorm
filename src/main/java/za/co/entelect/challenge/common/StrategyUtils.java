@@ -63,7 +63,7 @@ public class StrategyUtils {
         PlaneUtils.getBananaBombRange().forEach(l -> bananaRange.addAll(l));
         ConcurrentHashMap<Cell, Double> targetMapping = new ConcurrentHashMap<>();
         bananaRange.forEach(target -> {
-            List<Cell> area = WormUtils.getShootingArea(target, 2);
+            List<Cell> area = WormUtils.getBananaArea(target);
             double chanceKenaTotal = 0.0D;
             int wormcount = 0;
             for (Worm enemy : Bot.getOpponentWorms()) {
@@ -94,8 +94,8 @@ public class StrategyUtils {
         }
         if (maxVal >= 0.5D) {
             System.out.println("Agent can shoot two worm");
-            System.out.println("Ganti");
-            for (Cell cell : WormUtils.getShootingArea(max, 2)) {
+            System.out.println("Center : " + max.x + " " + max.y);
+            for (Cell cell : WormUtils.getBananaArea(max)) {
                 System.out.println(cell.x + " " + cell.y);
             }
             return max;
@@ -161,6 +161,10 @@ public class StrategyUtils {
             }
         }
         if (enemyEffected >= 2) {
+            System.out.println("Center : " + cell.x + " " + cell.y);
+            for (Cell cell1 : WormUtils.getShootingArea(cell, 1)) {
+                System.out.println(cell1.x + " " + cell1.y);
+            }
             return cell;
         }
         return null;
@@ -278,7 +282,7 @@ public class StrategyUtils {
         int enemyEffected = 0;
         Cell choosenCell = new Cell(0, 0);
         for (Cell banana : bananaRange) {
-            List<Cell> shootingRange = WormUtils.getShootingArea(banana, 1);
+            List<Cell> shootingRange = WormUtils.getBananaArea(banana);
             int curFriendEffected = 0;
             int curEnemyEffected = 0;
 
@@ -374,7 +378,7 @@ public class StrategyUtils {
         int enemyEffected = 0;
         Cell choosenCell = new Cell(0, 0);
         for (Cell banana : bananaRange) {
-            List<Cell> shootingRange = WormUtils.getShootingArea(banana, 2);
+            List<Cell> shootingRange = WormUtils.getBananaArea(banana);
             int curFriendEffected = 0;
             int curEnemyEffected = 0;
 
@@ -428,7 +432,7 @@ public class StrategyUtils {
         boolean canHitTarget = false;
         Cell choosenCell = new Cell(0, 0);
         for (Cell banana : bananaRange) {
-            List<Cell> shootingRange = WormUtils.getShootingArea(banana, 2);
+            List<Cell> shootingRange = WormUtils.getBananaArea(banana);
             int curFriendEffected = 0;
             boolean targetHitted = false;
             for (Cell shoot : shootingRange) {
