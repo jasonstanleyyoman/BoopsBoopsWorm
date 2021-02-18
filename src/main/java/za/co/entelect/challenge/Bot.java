@@ -143,11 +143,11 @@ public class Bot {
                 // targetCell = getArea(target); (cari cell yang bisa nembak target dan
                 // diusahakan ga kena teman)
 
-                // targetCell = StrategyUtils.bananaHitTarget(target);
+                targetCell = StrategyUtils.bananaHitTarget(target);
 
-                // if (targetCell != null) {
-                // return new BananaCommand(targetCell);
-                // }
+                if (targetCell != null) {
+                    return new BananaCommand(targetCell);
+                }
                 targetCell = StrategyUtils.getAvailableShoot(currentWorm);
                 if (targetCell != null) {
                     Direction direction = PlaneUtils.resolveDirection(currentWorm.position, targetCell);

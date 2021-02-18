@@ -37,7 +37,7 @@ public class WormUtils {
                 if (now == null)
                     continue;
                 if (Math.round(PlaneUtils.realEuclideanDistance(i, j, center.x, center.y)) <= radius
-                        && now.type != CellType.DEEP_SPACE) {
+                        && now.type != CellType.DEEP_SPACE && !center.equals(now)) {
                     cellShootingArea.add(now);
                 }
             }
