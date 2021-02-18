@@ -64,6 +64,8 @@ public class Bot {
                 .findFirst().orElse(new Worm(Profession.COMMANDO));
         Worm enemyTechnologist = Bot.getOpponentWorms().stream().filter(w -> w.profession == Profession.TECHNOLOGIST)
                 .findFirst().orElse(new Worm(Profession.TECHNOLOGIST));
+        Worm enemyAgent = Bot.getOpponentWorms().stream().filter(w -> w.profession == Profession.AGENT)
+                .findFirst().orElse(new Worm(Profession.AGENT));
         // Set worm target and set player worm to be selected
         // Worm targetWorm = StrategyUtils.setTargetWorm();
 
@@ -118,8 +120,8 @@ public class Bot {
 
                 if (!isAgentMoving) {
                     isAgentMoving = StrategyUtils.agentStartsMoving()
-                            || StrategyUtils.countMove(currentWorm.position, enemyCommando.position) <= 7
-                            || StrategyUtils.countMove(currentWorm.position, enemyTechnologist.position) <= 7;
+                            || StrategyUtils.countMove(currentWorm.position, enemyCommando.position) <= 9
+                            || StrategyUtils.countMove(currentWorm.position, enemyTechnologist.position) <= 9;
                     return new DoNothingCommand();
                 }
                 if (targetCell != null) {
@@ -209,15 +211,13 @@ public class Bot {
                     return new MoveCommand(nextCell);
                 }
             case COMMANDO:
-                // Strategi individu commando
-                // Kalau ada yang bisa ditembak, tembak aja
-                // Cari target (Agent > Technologist > Commando)
-                // Gerak ke target.
-                targetCell = StrategyUtils.getAvailableShoot(currentWorm);
-                if (targetCell != null) {
-                    Direction direction = PlaneUtils.resolveDirection(currentWorm.position, targetCell);
-                    return new ShootCommand(direction);
-                }
+                if (!WormUtils.isAlive(enemyAgent)){
+                    targetCell = StrategyUtils.getAvailableShoot(currentWorm);
+                    if (targetCell != null) {
+                        Direction direction = PlaneUtils.resolveDirection(currentWorm.position, targetCell);
+                        return new ShootCommand(direction);
+                    }    
+                }           
 
                 target = StrategyUtils.setTargetWorm(currentWorm);
 
