@@ -211,23 +211,23 @@ public class Bot {
                     return new MoveCommand(nextCell);
                 }
             case COMMANDO:
-                if (!WormUtils.isAlive(enemyAgent)){
-                    targetCell = StrategyUtils.getAvailableShoot(currentWorm);
-                    if (targetCell != null) {
-                        Direction direction = PlaneUtils.resolveDirection(currentWorm.position, targetCell);
-                        return new ShootCommand(direction);
-                    }    
-                } else {
-                    if (PlaneUtils.realEuclideanDistance(currentWorm.position, enemyAgent.position) <= 4){
-                        targetCell = StrategyUtils.getAvailableShoot(currentWorm);
-                            if (targetCell != null) {
-                            Direction direction = PlaneUtils.resolveDirection(currentWorm.position, targetCell);
-                            return new ShootCommand(direction);
-                        } 
-                    }
-                }   
+                targetCell = StrategyUtils.getAvailableShoot(currentWorm);
+                
+                if (targetCell != null && WormUtils.isAlive(enemyAgent) && targetCell != enemyAgent.position){
+                    Direction direction = PlaneUtils.resolveDirection(currentWorm.position, targetCell);
+                    return new ShootCommand(direction);
+                }
 
-                target = StrategyUtils.setTargetWorm(currentWorm);
+                if (targetCell != null && !WormUtils.isAlive(enemyAgent)) {
+                    Direction direction = PlaneUtils.resolveDirection(currentWorm.position, targetCell);
+                    return new ShootCommand(direction);
+                }
+                
+                if (WormUtils.isAlive(enemyAgent)){
+                    target = enemyAgent;    
+                } else {
+                    target = StrategyUtils.setTargetWorm(currentWorm);
+                }
 
                 // Gerak ke target;
                 nextCell = StrategyUtils.nearHealthPack(currentWorm.position);
